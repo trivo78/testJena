@@ -67,7 +67,11 @@ public class TestTxm {
 
             update(__insertData);   //do a bulk insert
             
+            update(__insertData);   //do a bulk insert without results
+            
             update(__deleteData);   //do a bulk delete
+            
+            update(__deleteData);   //do a bulk delete without results
 
             query("SELECT * WHERE {?firstName ?lastName ?state }");
             
