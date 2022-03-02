@@ -1,0 +1,5 @@
+
+*.class
+*.jar
+build/built-jar.properties
+build/classes/.netbeans_update_resources
