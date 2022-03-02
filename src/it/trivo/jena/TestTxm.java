@@ -43,17 +43,31 @@ public class TestTxm {
         "mp:person2 mp:state \"PZ\" ." + System.lineSeparator() +
         "}"
     ;
+    
+    private final static String __deleteData = 
+        "PREFIX mp: <http://mysparql.com/>" + System.lineSeparator()    +
+
+        "DELETE DATA {" + System.lineSeparator()                        +
+        "mp:person0 mp:firstname \"Jay\" ." + System.lineSeparator()    +
+        "}";
+    
+         
     private final static String __update1 = 
         "PREFIX mp: <http://mysparql.com/>" + System.lineSeparator() +
         "DELETE  { ?s mp:state 'CZ' }" + System.lineSeparator() +
         "INSERT  { ?s mp:state 'UZ' }" + System.lineSeparator() +
         "WHERE {?s mp:state 'CZ' }"
     ;
+    
+    
+
     public static void main(String[] args) {
         try {
             dataset = DatasetFactory.createTxnMem();
 
             update(__insertData);   //do a bulk insert
+            
+            update(__deleteData);   //do a bulk delete
 
             query("SELECT * WHERE {?firstName ?lastName ?state }");
             
