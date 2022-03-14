@@ -22,6 +22,7 @@ import org.apache.jena.sparql.modify.UpdateResult;
 import org.apache.jena.system.Txn;
 import org.apache.jena.update.UpdateAction;
 
+
 /**
  *
  * @author Lorenzo
@@ -59,13 +60,18 @@ public class TestTxm {
         "WHERE {?s mp:state 'CZ' }"
     ;
     
-    
+    private final static String __complicate_1 = 
+        "PREFIX schema:<http://schema.org/> " + System.lineSeparator() +
+        "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> " + System.lineSeparator() +
+        "PREFIX chat:<http://wot.arces.unibo.it/chat#> " + System.lineSeparator() +
+        "WITH <http://wot.arces.unibo.it/chat/> DELETE {?x rdf:type schema:Person . ?x schema:name <http://o>} INSERT {?person rdf:type schema:Person ; schema:name <http://o>}   " + System.lineSeparator() +
+        "WHERE {BIND(IRI(CONCAT(\"http://wot.arces.unibo.it/chat/person_\",STRUUID())) AS ?person) OPTIONAL {?x rdf:type schema:Person . ?x schema:name <http://o>}} " + System.lineSeparator() ;
 
-    public static void main(String[] args) {
-        try {
-            dataset = DatasetFactory.createTxnMem();
+    private static void doTests() {
+            query("SELECT * WHERE {GRAPH ?g { ?s ?p ?o }}");
 
             update(__insertData);   //do a bulk insert
+            
             
             update(__insertData);   //do a bulk insert without results
             
@@ -75,7 +81,44 @@ public class TestTxm {
 
             query("SELECT * WHERE {?firstName ?lastName ?state }");
             
-            update(__update1);
+            update(__update1);        
+    }
+    
+    private static void doMemTests() {
+        dataset = DatasetFactory.createTxnMem();
+        doTests();
+    }
+    
+    private static void doTDB2Tests() {
+        final org.apache.jena.dboe.base.file.Location loc = org.apache.jena.dboe.base.file.Location.create("./data2");
+        dataset = org.apache.jena.tdb2.TDB2Factory.connectDataset(loc);       
+        doTests();
+    }
+    private static void doTDB1Tests() {
+        final org.apache.jena.tdb.base.file.Location loc = org.apache.jena.tdb.base.file.Location.create("./data");
+        dataset = org.apache.jena.tdb.TDBFactory.createDataset(loc);
+        doTests();
+    }
+    
+    public static void main(String[] args) {
+        try {
+
+            
+            final boolean fUseMem = System.getProperty("USE_MEM") != null;
+            final boolean fUseTDB2 = System.getProperty("USE_TDB2") != null;
+            //dataset = dss;
+            if (fUseMem)
+                doMemTests();
+            else {
+                if (fUseTDB2)
+                    doTDB2Tests();
+                else
+                    doTDB1Tests();
+            }
+            
+            //update(__complicate_1);   //do a bulk insert
+            
+
 
         } catch(Throwable e)         {
             System.err.println(e);
